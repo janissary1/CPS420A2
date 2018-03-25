@@ -21,9 +21,10 @@ public class Test {
      * @param args the command line arguments
      */     
     public static void main(String[] args) {
-        testRandom();
-        
-        //testInput();
+        //testRandom();
+        String input = "6\n3 2 0 0 0 4\n2 4 0 3 3 2\n0 0 4 1 2 3\n0 3 1 4 2 0\n0 3 2 2 2 3\n4 2 3 0 3 4\n";
+        in = new Scanner(input);
+        testInput();
     }
    /**
     * Loops generating a random graph and looking for its Euler circuit if there is one
