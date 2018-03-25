@@ -277,21 +277,36 @@ public class Graph {
      * @return an Euler circuit for the graph if there is one, or null otherwise.
      */
     public Walk getEulerCircuit() {
-        Walk walk; 
-        for ( int i = 0; i < vertices; i++){
-            int row = i;
-            for (int k = i; k < vertices ; k++)
-            {
-                walk = new Walk(vertices);
-                if (edges[row][k] > 0 && visitedE[row][k] != edges[row][k]){
-                    walk.addVertex(k);
-                    visitedE[row][k] += 1;
-                    if (findEuler(i,k,vertices-1,walk)) {return walk;}
+        clearVisited();
+        Walk walk = new Walk(totaledges);
+        int[][] edges = unvisitedE;
+        int totalEdges = totaledges;
+
+        int column = 0;
+        int row = 0;
+
+        int direction = 1;
+
+        while (totalEdges > 0) {
+            int numEdges = edges[row][column];
+            
+            if (numEdges > 0) {
+                edges[row][column]--;
+                edges[column][row]--;
+
+                totalEdges--;
+                walk.addVertex(column);
+                row = column;        
+            } else {
+                column += direction;
+                if (column >= edges[row].length || column < 0) {
+                    direction *= -1;
+                    column += direction * 2;
                 }
-                row = k;
             }
         }
-        return null;
+        System.out.println(walk);
+        return walk;
     }
     
     /**
@@ -307,21 +322,7 @@ public class Graph {
      * @return True iff the Euler circuit has been successfully built 
      */
     private boolean findEuler(int startV, int currentV, int remainingEs, Walk Euler) {
-        if (currentV == startV && remainingEs == 0){System.out.println(Euler.toString());return true;}
-        else{
-            for (int i = vertices-1; i > 0; i-- ){
-                int degIncident = edges[currentV][i];
-                if (degIncident > 0 && degIncident != visitedE[currentV][i]){
-                    currentV = i;
-                    visitedE[currentV][i]++;
-                    Euler.addVertex(i);
-                    remainingEs--;
-                    return findEuler(startV,currentV,remainingEs,Euler);
-                }
-            }
-            System.out.println(Euler.toString());
-            return false;
-        }
+        return false;
         //return false;
     }
     
