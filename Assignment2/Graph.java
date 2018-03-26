@@ -255,33 +255,36 @@ public class Graph {
      */
     
     public boolean hasEulerCircuit(boolean printexplanation) {
-        if (!this.isConnected()){System.out.println("Cannot have a euler circuit, Graph is not connected.");return false;}
-        for (int i = 0; i < vertices;i++){
-            int[] row = edges[i];
-            int count = 0;
-            for(int k = 0; k < vertices;k++)
-            {
-                if (k == i) {count += row[k]*2;} 
-                else{count += row[k];}
-            }
-            if (count % 2 != 0){System.out.println("Cannot have a euler circuit, not all vertice degrees are even.");return false;}
-
+        if (!this.isConnected()) {
+            if (printexplanation) System.out.println("No Euler circuit: Graph is not connected.");
+            return false;
         }
-        System.out.println("Has a euler circuit. Graph is connected and all vertice degrees are even.");
+        for (int row = 0; row < vertices; row++){
+            int degree = 0;
+            for (int column = 0; column < vertices; column++)
+            {
+                if (row == column) {
+                    degree += edges[row][column] * 2; // loop
+                } else {
+                    degree += edges[row][column];
+                }
+            }
+            if (degree % 2 != 0) {
+                if (printexplanation) System.out.println("No Euler circuit: Vertex " + row + " has an odd degree (" + degree + ").");
+                return false;
+            }
+        }
+        if (printexplanation) System.out.println("Graph has Euler circuit: Graph is connected and all vertex degrees are even.");
         return true;
     }
-    private int getLoop(){
-        int count;
-        for (int i = 0; i < vertices; i++)
-        {
-            count = 0;
-            for (int k = 0; k < vertices; k++){
-                count += 1;
-            }
-            if (count % 2 != 0){return i;}
+    
+    private boolean rowDepleted(int row) {
+        for (int column = 0; column < unvisitedE[row].length; column += 1) {
+            if (unvisitedE[row][column] > 0) return false;
         }
-        return 0;
+        return true;
     }
+    
     /**
      * Finds a Euler circuit in graph if there is one.
      * @return an Euler circuit for the graph if there is one, or null otherwise.
@@ -289,47 +292,36 @@ public class Graph {
     public Walk getEulerCircuit() {
         clearVisited();
         Walk walk = new Walk(totaledges);
-        int[][] edges = unvisitedE;
-        int totalEdges = totaledges;
-
-        int column = 0;
+        Walk speculativeWalk = new Walk(totaledges);
+        
         int row = 0;
-        if (totaledges % 2 != 0){row = getLoop();column = row;}
-        int direction = 1;
-        for (int n = 0; n < 1000; n++) {
-            int numEdges = edges[row][column];
-            
-            if (numEdges > 0) {
-
-                edges[row][column]--;
-                if (column != row) {edges[column][row]--;}
-
-                totalEdges--;
-                walk.addVertex(column);
-                System.out.println(walk);
-                row = column;        
+        while (!rowDepleted(row) || speculativeWalk.totalVertices > 0) {
+            // System.out.print("The row for vertex " + row + " is ");
+            if (rowDepleted(row)) {
+                // System.out.print("depleted, so we add " + row + " to the final walk. ");
+                walk.addVertex(row);
+                // System.out.print("The walk is now " + walk + "and row went from " + row);
+                assert speculativeWalk.getVertices() > 0;
+                row = speculativeWalk.getVertex(speculativeWalk.getVertices() - 1);
+                speculativeWalk.removeLastVertex();
+                // System.out.println(" to " + row + ".");
             } else {
-                column += direction;
-                if (column >= edges[row].length || column < 0) {
-                    direction *= -1;
-                    column += direction;
+                // System.out.print("not depleted, so we push " + row + " onto the speculative walk and take an edge from ");
+                speculativeWalk.addVertex(row);
+                for (int column = 0; column < vertices; column += 1) {
+                    if (unvisitedE[row][column] > 0) {
+                        // System.out.print(row + " to " + column + ".");
+                        unvisitedE[row][column]--;
+                        if (row != column) unvisitedE[column][row]--;
+                        row = column;
+                        break;
+                    }
                 }
             }
-        boolean all_zeroes = true;
-        for (int j = 0; j < edges.length; j += 1) {
-            for (int i = 0; i < edges[j].length; i += 1)
-                if (edges[j][i] != 0) {
-                    all_zeroes = false;
-                    break;
-                }
-        if (!all_zeroes) break;
+            // System.out.println("\nThe speculative walk is now " + speculativeWalk + ".");
         }
-        if (all_zeroes) break;}
-        if (totalEdges > 0) System.out.print("(FAILED)");
-        System.out.println(walk);
-        for (int j = 0; j < edges.length; j += 1) {
-            for (int i = 0; i < edges[j].length; i += 1) System.out.print("" + edges[j][i] + " ");
-        System.out.println();}
+        // System.out.println(walk);
+        clearVisited();
         return walk;
     }
     
