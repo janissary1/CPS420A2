@@ -255,7 +255,6 @@ public class Graph {
      */
     
     public boolean hasEulerCircuit(boolean printexplanation) {
-        //System.out.println(this.getMatrix());
         if (!this.isConnected()){System.out.println("Cannot have a euler circuit, Graph is not connected.");return false;}
         for (int i = 0; i < vertices;i++){
             int[] row = edges[i];
@@ -271,7 +270,18 @@ public class Graph {
         System.out.println("Has a euler circuit. Graph is connected and all vertice degrees are even.");
         return true;
     }
-       
+    private int getLoop(){
+        int count;
+        for (int i = 0; i < vertices; i++)
+        {
+            count = 0;
+            for (int k = 0; k < vertices; k++){
+                count += 1;
+            }
+            if (count % 2 != 0){return i;}
+        }
+        return 0;
+    }
     /**
      * Finds a Euler circuit in graph if there is one.
      * @return an Euler circuit for the graph if there is one, or null otherwise.
@@ -284,28 +294,42 @@ public class Graph {
 
         int column = 0;
         int row = 0;
-
+        if (totaledges % 2 != 0){row = getLoop();column = row;}
         int direction = 1;
-
-        while (totalEdges > 0) {
+        for (int n = 0; n < 1000; n++) {
             int numEdges = edges[row][column];
             
             if (numEdges > 0) {
+
                 edges[row][column]--;
-                edges[column][row]--;
+                if (column != row) {edges[column][row]--;}
 
                 totalEdges--;
                 walk.addVertex(column);
+                System.out.println(walk);
                 row = column;        
             } else {
                 column += direction;
                 if (column >= edges[row].length || column < 0) {
                     direction *= -1;
-                    column += direction * 2;
+                    column += direction;
                 }
             }
+        boolean all_zeroes = true;
+        for (int j = 0; j < edges.length; j += 1) {
+            for (int i = 0; i < edges[j].length; i += 1)
+                if (edges[j][i] != 0) {
+                    all_zeroes = false;
+                    break;
+                }
+        if (!all_zeroes) break;
         }
+        if (all_zeroes) break;}
+        if (totalEdges > 0) System.out.print("(FAILED)");
         System.out.println(walk);
+        for (int j = 0; j < edges.length; j += 1) {
+            for (int i = 0; i < edges[j].length; i += 1) System.out.print("" + edges[j][i] + " ");
+        System.out.println();}
         return walk;
     }
     
