@@ -22,7 +22,8 @@ public class Test {
      */     
     public static void main(String[] args) {
         //testRandom();
-        String input = "6\n3 2 0 0 0 4\n2 4 0 3 3 2\n0 0 4 1 2 3\n0 3 1 4 2 0\n0 3 2 2 2 3\n4 2 3 0 3 4\n";
+        //String input = "6\n3 2 0 0 0 4\n2 4 0 3 3 2\n0 0 4 1 2 3\n0 3 1 4 2 0\n0 3 2 2 2 3\n4 2 3 0 3 4\n";
+        String input = "6\n0 2 2 0 0 0\n2 0 0 1 1 0\n2 0 1 1 2 1\n0 1 1 2 2 2\n0 1 2 2 1 1\n0 0 1 2 1 0\n";
         in = new Scanner(input);
         testInput();
     }
